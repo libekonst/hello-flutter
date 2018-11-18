@@ -5,8 +5,15 @@ import './category.dart';
 final _backgroundColor = Colors.teal[100];
 
 // This is the home screen.
-class CategoryRoute extends StatelessWidget {
+class CategoryRoute extends StatefulWidget {
   const CategoryRoute();
+
+  @override
+  createState() => CategoryRouteState();
+}
+
+class CategoryRouteState extends State<CategoryRoute> {
+  final _categories = <Category>[];
 
   static const _categoryNames = <String>[
     'Length',
@@ -30,17 +37,29 @@ class CategoryRoute extends StatelessWidget {
     Colors.red,
   ];
 
-  Widget _buildCategoryWidgets(List<Widget> categories) {
+  void initState() {
+    super.initState();
+    for (var i = 0; i < _categoryNames.length; i++) {
+      _categories.add(new Category(
+        name: _categoryNames[i],
+        color: _baseColors[i],
+        iconLocation: Icons.cake,
+        units: _retrieveUnitList(_categoryNames[i]),
+      ));
+    }
+  }
+
+  _buildCategoryWidgets() {
     return ListView.builder(
-      itemBuilder: (BuildContext context, int index) => categories[index],
-      itemCount: categories.length,
+      itemBuilder: (BuildContext context, int index) => _categories[index],
+      itemCount: _categories.length,
     );
   }
 
   _retrieveUnitList(String categoryName) {
-    return new List.generate(10, (int i) {
+    return List.generate(10, (int i) {
       i += 1;
-      return new Unit(
+      return Unit(
         name: '$categoryName Unit $i',
         conversion: i.toDouble(),
       );
@@ -49,9 +68,15 @@ class CategoryRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget appBar = new AppBar(
+    final listView = Container(
+      color: _backgroundColor,
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      child: _buildCategoryWidgets(),
+    );
+
+    final appBar = AppBar(
       elevation: 0.0,
-      backgroundColor: _backgroundColor,
+      // backgroundColor: _backgroundColor,
       title: Text(
         'Unit Converter',
         style: TextStyle(color: Colors.black, fontSize: 30.0),
@@ -59,24 +84,7 @@ class CategoryRoute extends StatelessWidget {
       centerTitle: true,
     );
 
-    final List categories = <Category>[];
-
-    for (var i = 0; i < _categoryNames.length; i++) {
-      categories.add(new Category(
-        name: _categoryNames[i],
-        color: _baseColors[i],
-        iconLocation: Icons.cake,
-        units: _retrieveUnitList(_categoryNames[i]),
-      ));
-    }
-
-    final Widget listView = new Container(
-      color: _backgroundColor,
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: _buildCategoryWidgets(categories),
-    );
-
-    return new Scaffold(
+    return Scaffold(
       appBar: appBar,
       body: listView,
     );
